@@ -1,0 +1,19 @@
+{
+    "dla": {
+    "keywords": [
+        "dla",
+        "dislocation allowance",
+        "relocation allowance",
+        "moving allowance"
+    ],
+    "answer": "DLA stands for Dislocation Allowance."
+    },  
+    "tad": {
+        "keywords": ["tad", "temporary additional duty"],
+        "answer": "TAD stands for Temporary Additional Duty."
+    },
+    "pcs": {
+        "keywords": ["pcs", "permanent change of station"],
+        "answer": "PCS stands for Permanent Change of Station."
+    }
+}

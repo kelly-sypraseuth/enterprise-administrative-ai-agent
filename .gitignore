@@ -1,0 +1,19 @@
+# Secrets
+.env
+
+# Python virtual environment
+.venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Generated embedding data
+data/embeddings.json
+
+# VS Code local settings
+.vscode/
+
+# Operating system files
+.DS_Store
+Thumbs.db
