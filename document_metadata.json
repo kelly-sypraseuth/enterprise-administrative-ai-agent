@@ -1,0 +1,20 @@
+{
+    "s1_reference.txt": {
+        "title": "S-1 Reference",
+        "document_type": "Project Training Reference",
+        "authority": "Project Reference",
+        "version": "1.0"
+    },
+    "training_reference.txt": {
+        "title": "S-1 Training Reference",
+        "document_type": "Project Training Reference",
+        "authority": "Project Reference",
+        "version": "1.0"
+    },
+    "MCO 5000.14D.pdf": {
+        "title": "MCO 5000.14D",
+        "document_type": "Marine Corps Order",
+        "authority": "United States Marine Corps",
+        "version": "5000.14D"
+    }
+}

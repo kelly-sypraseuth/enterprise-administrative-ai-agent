@@ -1,8 +1,8 @@
-import json
-
-import numpy as np
-
 from llm import client
+from vector_store import get_collection
+
+
+MINIMUM_SCORE = 0.35
 
 
 def get_embedding(text):
@@ -14,57 +14,114 @@ def get_embedding(text):
     return response.data[0].embedding
 
 
-def cosine_similarity(vector_a, vector_b):
-    a = np.array(vector_a)
-    b = np.array(vector_b)
+def convert_distance_to_similarity(
+    distance
+):
+    return 1 - distance
 
-    return np.dot(a, b) / (
-        np.linalg.norm(a) * np.linalg.norm(b)
+
+def search_vector_database(
+    question,
+    number_of_results
+):
+    collection = get_collection()
+
+    total_records = collection.count()
+
+    if total_records == 0:
+        return []
+
+    result_count = min(
+        number_of_results,
+        total_records
     )
 
+    question_embedding = get_embedding(
+        question
+    )
 
-def load_embedding_cache():
-    with open(
-        "data/embeddings.json",
-        "r",
-        encoding="utf-8"
-    ) as file:
-        return json.load(file)
-
-
-def get_ranked_results(question):
-    cached_chunks = load_embedding_cache()
-
-    question_embedding = get_embedding(question)
+    response = collection.query(
+        query_embeddings=[
+            question_embedding
+        ],
+        n_results=result_count,
+        include=[
+            "documents",
+            "metadatas",
+            "distances"
+        ]
+    )
 
     results = []
 
-    for item in cached_chunks:
-        score = cosine_similarity(
-            question_embedding,
-            item["embedding"]
+    documents = response["documents"][0]
+    metadatas = response["metadatas"][0]
+    distances = response["distances"][0]
+
+    for document, metadata, distance in zip(
+        documents,
+        metadatas,
+        distances
+    ):
+        score = convert_distance_to_similarity(
+            distance
         )
+
+        page_number = metadata.get(
+            "page_number",
+            0
+        )
+
+        if page_number == 0:
+            page_number = None
 
         results.append(
             {
-                "text": item["text"],
-                "source": item["source"],
-                "document_name": item["document_name"],
-                "chunk_number": item["chunk_number"],
+                "text": document,
+                "source": metadata["source"],
+                "document_name": metadata[
+                    "document_name"
+                ],
+                "title": metadata["title"],
+                "document_type": metadata[
+                    "document_type"
+                ],
+                "authority": metadata["authority"],
+                "version": metadata["version"],
+                "page_number": page_number,
+                "chunk_number": metadata[
+                    "chunk_number"
+                ],
                 "score": score
             }
         )
 
-    results.sort(
-        key=lambda result: result["score"],
-        reverse=True
-    )
-
     return results
 
 
-def semantic_document_search(question, top_k=3, threshold=0.35):
-    results = get_ranked_results(question)
+def get_ranked_results(question):
+    collection = get_collection()
+
+    total_records = collection.count()
+
+    if total_records == 0:
+        return []
+
+    return search_vector_database(
+        question,
+        total_records
+    )
+
+
+def semantic_document_search(
+    question,
+    top_k=3,
+    threshold=MINIMUM_SCORE
+):
+    results = search_vector_database(
+        question,
+        top_k
+    )
 
     relevant_results = [
         result
@@ -72,4 +129,14 @@ def semantic_document_search(question, top_k=3, threshold=0.35):
         if result["score"] >= threshold
     ]
 
-    return relevant_results[:top_k]
+    return relevant_results
+
+
+def get_confidence(score):
+    if score >= 0.55:
+        return "HIGH"
+
+    if score >= MINIMUM_SCORE:
+        return "MODERATE"
+
+    return "LOW"

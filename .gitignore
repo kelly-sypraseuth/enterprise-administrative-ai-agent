@@ -17,3 +17,7 @@ data/embeddings.json
 # Operating system files
 .DS_Store
 Thumbs.db
+
+data/chroma_db/
+
+logs/
