@@ -4,17 +4,22 @@ from agent import run_agent
 
 
 st.set_page_config(
-    page_title="MISSO AI Agent",
+    page_title="Enterprise Administrative AI Agent",
     page_icon="🤖",
     layout="centered"
 )
 
 
-st.title("MISSO AI Agent")
+st.title("Enterprise Administrative AI Agent")
 
 st.caption(
     "AI-assisted administrative reference system "
     "using approved project documents."
+)
+
+st.markdown(
+    "**Capabilities:** RAG • Semantic Search • Tool Calling • "
+    "Guardrails • Audit Logging"
 )
 
 
@@ -55,7 +60,21 @@ if question:
                 question
             )
 
-        st.markdown(answer)
+        if "\n\nSources:\n" in answer:
+            main_answer, sources = answer.split(
+                "\n\nSources:\n",
+                1
+            )
+
+            st.markdown(main_answer)
+
+            with st.expander(
+                "View source references"
+            ):
+                st.markdown(sources)
+
+        else:
+            st.markdown(answer)
 
     st.session_state.messages.append(
         {

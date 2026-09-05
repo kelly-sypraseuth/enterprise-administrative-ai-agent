@@ -113,18 +113,19 @@ def run_agent(user_question):
         return blocked_response
 
     response = client.responses.create(
-        model=AGENT_MODEL,
-        instructions=(
-            "You are an S-1 administrative AI assistant. "
-            "Use the available tools when the user asks about "
-            "administrative reference information or available "
-            "reference documents. "
-            "Do not invent information that is not supported "
-            "by the tools."
-        ),
-        input=user_question,
-        tools=TOOLS
-    )
+    model=AGENT_MODEL,
+    instructions=(
+        "You are an S-1 administrative AI assistant. "
+        "Use the available tools when the user asks about "
+        "administrative reference information or available "
+        "reference documents. "
+        "Do not invent information that is not supported "
+        "by the tools."
+    ),
+    input=user_question,
+    tools=TOOLS,
+    tool_choice="required"
+)
 
     tool_outputs = []
 
@@ -165,22 +166,10 @@ def run_agent(user_question):
 
         return fallback_response
 
-    final_response = client.responses.create(
-        model=AGENT_MODEL,
-        instructions=(
-            "You are an S-1 administrative AI assistant. "
-            "Answer only using the tool results provided. "
-            "Do not add unsupported information. "
-            "If the tool results do not support an answer, "
-            "say that the approved references do not provide "
-            "enough information."
-        ),
-        previous_response_id=response.id,
-        input=tool_outputs,
-        tools=TOOLS
+    final_answer = "\n\n".join(
+        item["output"]
+        for item in tool_outputs
     )
-
-    final_answer = final_response.output_text
 
     write_log(
         "final_response",
