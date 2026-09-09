@@ -2,6 +2,10 @@
 
 An AI-powered administrative reference assistant built as a portfolio project to demonstrate enterprise AI engineering concepts using Python, Retrieval-Augmented Generation (RAG), vector search, tool calling, guardrails, audit logging, and a web-based user interface.
 
+## Live Demo
+
+[Launch the Enterprise Administrative AI Agent](https://sypraseuth-enterprise-ai-agent.streamlit.app/)
+
 ## Overview
 
 The Enterprise Administrative AI Agent allows users to ask administrative questions in natural language and receive responses grounded in approved reference documents.
@@ -41,6 +45,7 @@ The system is designed to avoid unsupported responses when sufficient reference 
 - JSONL audit logging
 - Automated retrieval evaluation
 - Streamlit chat interface
+- Automatic vector database initialization for cloud deployment
 - Environment-variable protection for API credentials
 
 ## Architecture
@@ -100,6 +105,14 @@ The application records key system events in JSONL format, including:
 
 This provides a basic audit trail for reviewing how the agent processed a request.
 
+## Cloud Deployment
+
+The application is deployed through Streamlit Community Cloud.
+
+When the application starts, it checks whether the ChromaDB vector collection is available. If the database is missing, the application initializes the knowledge base from the approved project documents and creates the required embeddings automatically.
+
+API credentials are provided through deployment secrets and are not stored in the public GitHub repository.
+
 ## Project Structure
 
 ```text
@@ -146,3 +159,51 @@ enterprise-administrative-ai-agent/
 ├── tools.py
 └── vector_store.py
 ```
+
+## Running the Application Locally
+
+Create and activate a Python virtual environment, install the required dependencies, and configure the required environment variables.
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the Streamlit application:
+
+```bash
+streamlit run app.py
+```
+
+Then open the local Streamlit address shown in the terminal.
+
+## Security
+
+API credentials are stored using environment variables or deployment secrets and are excluded from the GitHub repository through `.gitignore`.
+
+Sensitive credentials should never be committed directly to source control.
+
+The project uses approved reference documents for retrieval and includes guardrails designed to limit unsupported or out-of-scope responses.
+
+## Portfolio Purpose
+
+This project demonstrates practical AI engineering concepts including RAG, vector databases, semantic retrieval, agent tool calling, grounding controls, guardrails, auditability, cloud deployment, and user-facing AI application development.
+
+The architecture is designed to represent how an AI assistant can support real-world administrative and enterprise knowledge workflows while maintaining source transparency and controlled access to approved information.
+
+## Future Enhancements
+
+Potential future enhancements include:
+
+- Role-based access controls
+- User authentication
+- Additional enterprise tools
+- Expanded document ingestion
+- Improved retrieval evaluation
+- Conversation memory
+- Advanced observability
+- Usage analytics
+- Containerization
+- API-based integrations
+- Cloud-native vector database support
