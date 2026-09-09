@@ -1,6 +1,7 @@
 import streamlit as st
 
 from agent import run_agent
+from build_embeddings import ensure_vector_database
 
 
 st.set_page_config(
@@ -8,6 +9,17 @@ st.set_page_config(
     page_icon="🤖",
     layout="centered"
 )
+
+
+@st.cache_resource
+def initialize_database():
+    ensure_vector_database()
+
+
+with st.spinner(
+    "Initializing knowledge base..."
+):
+    initialize_database()
 
 
 st.title("Enterprise Administrative AI Agent")

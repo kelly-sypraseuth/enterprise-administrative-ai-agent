@@ -5,7 +5,10 @@ import os
 from chunking import chunk_text
 from document_loader import load_document
 from llm import client
-from vector_store import reset_collection
+from vector_store import (
+    get_collection,
+    reset_collection,
+)
 
 
 DOCUMENT_FOLDER = "documents"
@@ -51,11 +54,16 @@ def load_all_chunks():
     metadata_registry = load_metadata()
 
     file_paths = glob.glob(
-        os.path.join(DOCUMENT_FOLDER, "*")
+        os.path.join(
+            DOCUMENT_FOLDER,
+            "*"
+        )
     )
 
     for file_path in file_paths:
-        document = load_document(file_path)
+        document = load_document(
+            file_path
+        )
 
         if not document:
             continue
@@ -83,7 +91,9 @@ def load_all_chunks():
                         "document_type": metadata[
                             "document_type"
                         ],
-                        "authority": metadata["authority"],
+                        "authority": metadata[
+                            "authority"
+                        ],
                         "version": metadata["version"],
                         "page_number": 0,
                         "chunk_number": chunk[
@@ -111,7 +121,9 @@ def load_all_chunks():
                             "authority": metadata[
                                 "authority"
                             ],
-                            "version": metadata["version"],
+                            "version": metadata[
+                                "version"
+                            ],
                             "page_number": page[
                                 "page_number"
                             ],
@@ -179,7 +191,9 @@ def build_vector_database():
                     "authority": chunk[
                         "authority"
                     ],
-                    "version": chunk["version"],
+                    "version": chunk[
+                        "version"
+                    ],
                     "page_number": chunk[
                         "page_number"
                     ],
@@ -198,6 +212,26 @@ def build_vector_database():
         f"Records stored: "
         f"{collection.count()}"
     )
+
+
+def ensure_vector_database():
+    try:
+        collection = get_collection()
+
+        if collection.count() > 0:
+            print(
+                f"Vector database already available "
+                f"with {collection.count()} records."
+            )
+            return
+
+    except Exception:
+        print(
+            "Vector database not found. "
+            "Building from reference documents..."
+        )
+
+    build_vector_database()
 
 
 if __name__ == "__main__":
